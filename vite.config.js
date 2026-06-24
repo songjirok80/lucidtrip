@@ -18,7 +18,8 @@ export default defineConfig({
         lang: 'ko',
         theme_color: '#0ea5a4',
         background_color: '#ffffff',
-        display: 'standalone', // 주소창 없이 진짜 앱처럼
+        display: 'fullscreen', // 상태바·내비바까지 숨긴 완전 전체화면 (안드로이드)
+        display_override: ['fullscreen', 'standalone'],
         start_url: '/',
         icons: [
           {

@@ -194,6 +194,9 @@ function App() {
   // 배경 윗부분이 어두우면 헤더(태그라인)를 흰 글씨로 — 배경 때문에 안 보이는 것 방지
   const [headerDark, setHeaderDark] = useState(false)
 
+  // 설치된 앱(전체화면/standalone)에서 뒤로가기 두 번으로 종료 + 안내 토스트
+  const [toast, setToast] = useState('')
+
   function addRecent(code) {
     setRecents((prev) => {
       const next = [code, ...prev.filter((c) => c !== code)].slice(0, 6)
@@ -284,6 +287,42 @@ function App() {
       cancelled = true
     }
   }, [homeKey])
+
+  // 설치된 앱에서 "뒤로가기 두 번 누르면 종료" — 한 번 누르면 안내, 2초 내 다시 누르면 종료.
+  // (브라우저 탭에서는 적용 안 함)
+  useEffect(() => {
+    const installed =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.matchMedia('(display-mode: fullscreen)').matches ||
+      window.navigator.standalone === true
+    if (!installed) return
+
+    // 뒤로가기를 잡아둘 더미 기록 하나를 쌓아둔다
+    window.history.pushState(null, '', window.location.href)
+    let lastBack = 0
+    let toastTimer
+
+    const onPop = () => {
+      const now = Date.now()
+      if (now - lastBack < 2000) {
+        // 2초 내 두 번째 → 실제로 한 칸 더 뒤로(앱 종료)
+        window.history.back()
+        return
+      }
+      // 첫 번째 → 다시 더미를 쌓아 앱에 머무르고 안내 표시
+      lastBack = now
+      window.history.pushState(null, '', window.location.href)
+      setToast(t.exitHint)
+      clearTimeout(toastTimer)
+      toastTimer = setTimeout(() => setToast(''), 1800)
+    }
+
+    window.addEventListener('popstate', onPop)
+    return () => {
+      window.removeEventListener('popstate', onPop)
+      clearTimeout(toastTimer)
+    }
+  }, [])
 
   // 새 배경 레이어의 페이드인이 끝나면 그 아래 오래된 레이어들을 정리
   function handleBgFadeDone(id) {
@@ -482,6 +521,20 @@ function App() {
         onPick={addCard}
         onClose={() => setAddOpen(false)}
       />
+
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            className="exit-toast"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.2 }}
+          >
+            {toast}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }

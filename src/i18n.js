@@ -18,6 +18,7 @@ const STRINGS = {
     removeCard: '이 통화 빼기',
     swap: '통화 순서 바꾸기',
     addCard: '통화 추가',
+    exitHint: '한 번 더 누르면 종료됩니다',
   },
   en: {
     appTitle: 'LucidTrip — Travel Currency Converter',
@@ -32,6 +33,7 @@ const STRINGS = {
     removeCard: 'Remove',
     swap: 'Swap order',
     addCard: 'Add currency',
+    exitHint: 'Press back again to exit',
   },
 }
 
