@@ -324,6 +324,12 @@ function App() {
     }
   }, [])
 
+  // 현재 배경을 html에도 깔아둔다 — 전체화면에서 카메라/상단 영역(콘텐츠 밖)까지 같은 배경으로 채워 검은 띠 방지
+  useEffect(() => {
+    const cur = bgLayers[bgLayers.length - 1]
+    if (cur) document.documentElement.style.background = cur.bg
+  }, [bgLayers])
+
   // 새 배경 레이어의 페이드인이 끝나면 그 아래 오래된 레이어들을 정리
   function handleBgFadeDone(id) {
     setBgLayers((prev) => {
