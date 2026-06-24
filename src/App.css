@@ -64,12 +64,24 @@
   line-height: 1.1;
 }
 
-/* 로고(워드마크 SVG) — 텍스트 제목 대신 */
+/* 로고(워드마크) — 글자 모양을 마스크로, 안쪽은 배경 기반 그라데이션으로 채워 색이 적응 */
 .app-logo {
+  position: relative;
   display: block;
   height: 30px;
-  width: auto;
+  aspect-ratio: 100.4 / 27.4; /* 로고 원본 비율 */
   margin: 0 auto;
+  padding: 0;
+}
+
+/* 배경/제목 색이 바뀌면 새 그라데이션 레이어가 페이드인 (예전 제목과 동일) */
+.logo-layer {
+  position: absolute;
+  inset: 0;
+  background-size: 100% 100%;
+  -webkit-mask: url('/logo-mask.svg') center / contain no-repeat;
+  mask: url('/logo-mask.svg') center / contain no-repeat;
+  animation: bgFadeIn 0.9s ease forwards;
 }
 
 .title-spacer {

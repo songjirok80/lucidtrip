@@ -4,7 +4,6 @@ import CurrencyPicker, { CurrencyPickerModal } from './CurrencyPicker'
 import { buildEntries } from './currencies'
 import { getTheme, getInitialTheme, getHeaderDark } from './theme'
 import { t, formatDateStr } from './i18n'
-import logoUrl from './assets/lucidtrip-logo.svg'
 import './App.css'
 
 // 통화별 소수점 자릿수 (없으면 기본 2자리)
@@ -453,8 +452,14 @@ function App() {
       </div>
       <main className="app">
         <header className={headerDark ? 'app-header on-dark' : 'app-header'}>
-          <h1 className="app-title">
-            <img className="app-logo" src={logoUrl} alt="LucidTrip" />
+          <h1 className="app-logo" aria-label="LucidTrip">
+            {bgLayers.map((layer) => (
+              <span
+                key={layer.id}
+                className="logo-layer"
+                style={{ backgroundImage: layer.title }}
+              />
+            ))}
           </h1>
           <p className="tagline">The Lucid Standard for Every Trip</p>
         </header>
