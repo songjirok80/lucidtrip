@@ -178,14 +178,27 @@
   padding: 0;
   border: none;
   background: transparent;
-  color: rgba(255, 255, 255, 0.65);
-  font-size: 14px;
-  line-height: 1;
   cursor: pointer;
 }
 
-.card-remove:hover {
-  color: rgba(255, 255, 255, 0.95);
+.x-icon {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-linecap: round;
+}
+
+.card-remove:hover .x-icon {
+  stroke: #fff;
+}
+
+/* 세 아이콘(스왑·추가·닫기) 선 두께를 화면상 동일하게 — 크기가 달라도 2px 고정 */
+.swap-icon,
+.add-icon,
+.x-icon {
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
 }
 
 /* 금액 입력칸 (테두리 없이 카드 안에 녹아듦) */
@@ -272,7 +285,7 @@
   height: 22px;
   fill: none;
   stroke: #fff;
-  stroke-width: 2.2;
+  stroke-width: 2;
   stroke-linecap: round;
 }
 

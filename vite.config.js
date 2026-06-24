@@ -9,7 +9,7 @@ export default defineConfig({
     VitePWA({
       // 새 버전이 나오면 조용히 알아서 갱신
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'pwa-icon.svg'],
+      includeAssets: ['favicon.svg', 'pwa-icon-192.png', 'pwa-icon-512.png'],
       // 설치 정보 (앱 이름, 색, 아이콘 등)
       manifest: {
         name: 'LucidTrip — 여행 환율 계산기',
@@ -22,17 +22,14 @@ export default defineConfig({
         display_override: ['fullscreen', 'standalone'],
         start_url: '/',
         icons: [
-          {
-            src: 'pwa-icon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
-            purpose: 'any maskable',
-          },
+          { src: 'pwa-icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'pwa-icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: 'pwa-icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       // 오프라인용으로 미리 저장할 파일들 (국기 svg + 나라 배경 webp 포함)
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,woff2,webp}'],
+        globPatterns: ['**/*.{js,css,html,svg,woff2,webp,png}'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
       },
       // 개발 서버에서도 동작 확인 가능하게 (정확한 테스트는 빌드본에서)
