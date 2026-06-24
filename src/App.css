@@ -64,6 +64,14 @@
   line-height: 1.1;
 }
 
+/* 로고(워드마크 SVG) — 텍스트 제목 대신 */
+.app-logo {
+  display: block;
+  height: 30px;
+  width: auto;
+  margin: 0 auto;
+}
+
 .title-spacer {
   visibility: hidden; /* 자리만 차지(레이아웃 기준) */
 }
@@ -313,7 +321,7 @@
   border-radius: 2px;
   background-size: cover;
   background-position: center;
-  box-shadow: inset 0 0 0 1px #afafaf;
+  box-shadow: inset 0 0 0 0.5px #afafaf;
 }
 
 .flag-none {

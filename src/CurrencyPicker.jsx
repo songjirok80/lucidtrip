@@ -68,7 +68,6 @@ export function CurrencyPickerModal({ open, valueKey, entries, recents, onPick, 
               placeholder={t.searchPlaceholder}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              autoFocus
             />
             <div className="picker-list">
               {!q && favorites.length > 0 && (

@@ -35,6 +35,17 @@ body {
   margin: 0;
 }
 
+/* 모바일에서 버튼·링크 누를 때 생기는 파란 하이라이트 박스 제거 */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 마우스가 아닌 터치/클릭 시 파란 포커스 테두리도 숨김 (키보드 탭은 유지) */
+button:focus:not(:focus-visible),
+.currency-trigger:focus:not(:focus-visible) {
+  outline: none;
+}
+
 #root {
   min-height: 100svh;
 }

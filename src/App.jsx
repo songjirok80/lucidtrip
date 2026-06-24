@@ -4,10 +4,8 @@ import CurrencyPicker, { CurrencyPickerModal } from './CurrencyPicker'
 import { buildEntries } from './currencies'
 import { getTheme, getInitialTheme, getHeaderDark } from './theme'
 import { t, formatDateStr } from './i18n'
+import logoUrl from './assets/lucidtrip-logo.svg'
 import './App.css'
-
-// 한 화면에서 비교할 수 있는 최대 통화 카드 수
-const MAX_CARDS = 6
 
 // 통화별 소수점 자릿수 (없으면 기본 2자리)
 const DECIMALS = {
@@ -41,6 +39,28 @@ function saveCached(rates, savedAt) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ rates, savedAt }))
   } catch {
     // 저장 공간이 막혀 있어도 앱은 그냥 동작
+  }
+}
+
+// 마지막으로 보던 카드 구성(나라/통화)을 기억하는 이름표 — 금액은 저장 안 함(새로고침 시 0으로)
+const SLOTS_KEY = 'triprate-slots'
+
+// 기본 카드 (처음 켤 때)
+const DEFAULT_SLOTS = [
+  { id: 0, code: 'KRW', place: 'KR', flag: 'kr' },
+  { id: 1, code: 'VND', place: 'VN', flag: 'vn' },
+]
+
+// 저장된 카드 구성 불러오기 (없거나 이상하면 기본값). id는 0부터 다시 매김.
+function loadSlots() {
+  try {
+    const arr = JSON.parse(localStorage.getItem(SLOTS_KEY))
+    if (!Array.isArray(arr) || arr.length === 0) return DEFAULT_SLOTS
+    return arr
+      .filter((s) => s && s.code)
+      .map((s, i) => ({ id: i, code: s.code, place: s.place ?? null, flag: s.flag ?? null }))
+  } catch {
+    return DEFAULT_SLOTS
   }
 }
 
@@ -151,14 +171,23 @@ const CurrencyCard = forwardRef(function CurrencyCard({
 function App() {
   // 카드들을 {id, code(계산용 통화), place(표시용 나라 id|null), flag} 배열로 관리.
   // place가 있으면 그 나라의 배경/국기를 쓰고, 없으면 통화 코드 기준으로 자동 표시.
-  const [slots, setSlots] = useState([
-    { id: 0, code: 'KRW', place: 'KR', flag: 'kr' },
-    { id: 1, code: 'VND', place: 'VN', flag: 'vn' },
-  ])
-  const nextSlotId = useRef(2)
+  const [slots, setSlots] = useState(loadSlots) // 마지막 본 나라 구성 복원
+  const nextSlotId = useRef(slots.length)
   const [addOpen, setAddOpen] = useState(false) // 통화 추가 팝업 열림 여부
   const [activeIndex, setActiveIndex] = useState(0) // 마지막에 입력한 카드
-  const [value, setValue] = useState('1,000,000') // 그 카드에 입력된 숫자(쉼표 포함)
+  const [value, setValue] = useState('0') // 금액은 새로고침마다 0으로 시작(저장 안 함)
+
+  // 카드 구성(나라/통화)이 바뀌면 저장 — 다음에 켤 때 그대로 복원 (금액은 제외)
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        SLOTS_KEY,
+        JSON.stringify(slots.map((s) => ({ code: s.code, place: s.place, flag: s.flag }))),
+      )
+    } catch {
+      // 저장 실패해도 앱은 그냥 동작
+    }
+  }, [slots])
 
   // 스왑 애니메이션 상태 (위치 이동은 layout이 처리, swapping은 입체 강조용)
   const [swapping, setSwapping] = useState(false)
@@ -219,12 +248,12 @@ function App() {
     addRecent(entry.key)
   }
 
-  // +버튼 팝업에서 고른 엔트리로 카드 추가 (최대 MAX_CARDS)
+  // +버튼 팝업에서 고른 엔트리로 카드 추가 (개수 제한 없음)
   function addCard(entry) {
-    setSlots((prev) => {
-      if (prev.length >= MAX_CARDS) return prev
-      return [...prev, { id: nextSlotId.current++, code: entry.code, place: entry.place, flag: entry.flag }]
-    })
+    setSlots((prev) => [
+      ...prev,
+      { id: nextSlotId.current++, code: entry.code, place: entry.place, flag: entry.flag },
+    ])
     addRecent(entry.key)
     setAddOpen(false)
   }
@@ -425,16 +454,7 @@ function App() {
       <main className="app">
         <header className={headerDark ? 'app-header on-dark' : 'app-header'}>
           <h1 className="app-title">
-            <span className="title-spacer">LucidTrip</span>
-            {bgLayers.map((layer) => (
-              <span
-                key={layer.id}
-                className="title-layer"
-                style={{ backgroundImage: layer.title }}
-              >
-                LucidTrip
-              </span>
-            ))}
+            <img className="app-logo" src={logoUrl} alt="LucidTrip" />
           </h1>
           <p className="tagline">The Lucid Standard for Every Trip</p>
         </header>
@@ -491,20 +511,18 @@ function App() {
             })}
           </AnimatePresence>
 
-          {slots.length < MAX_CARDS && (
-            <motion.div className="add-row" layout>
-              <button
-                type="button"
-                className="add-button"
-                onClick={() => setAddOpen(true)}
-                aria-label={t.addCard}
-              >
-                <svg className="add-icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-              </button>
-            </motion.div>
-          )}
+          <motion.div className="add-row" layout>
+            <button
+              type="button"
+              className="add-button"
+              onClick={() => setAddOpen(true)}
+              aria-label={t.addCard}
+            >
+              <svg className="add-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+            </button>
+          </motion.div>
         </section>
 
         <footer className="app-footer">
