@@ -1,0 +1,434 @@
+/* ===== 배경 (통화별 그라데이션, 화면 전체) ===== */
+.app-bg {
+  position: fixed;
+  inset: -50px; /* 블러 가장자리를 화면 밖으로 빼서 깔끔하게 */
+  z-index: -1;
+  overflow: hidden;
+}
+
+/* 배경 레이어: 새로 얹힌 레이어가 천천히 페이드인 → 색이 스며들듯 전환 */
+.app-bg-layer {
+  position: absolute;
+  inset: 0;
+  animation: bgFadeIn 0.9s ease forwards;
+  will-change: opacity;
+  filter: blur(22px); /* 자동 생성 블롭을 물감처럼 녹임 */
+  background-size: cover;
+  background-position: center;
+}
+
+/* 디자인 이미지 배경은 이미 부드러우니 추가 블러를 끈다 */
+.app-bg-layer.is-image {
+  filter: none;
+}
+
+@keyframes bgFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===== 전체 레이아웃 ===== */
+.app {
+  width: 100%;
+  max-width: 393px;
+  min-height: 100svh;
+  margin: 0 auto;
+  padding: 40px 24px 28px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== 헤더 (밝은 배경 위 → 어두운 글자) ===== */
+.app-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+/* 제목: 배경색 그라데이션 글자 + 국가 변경 시 부드럽게 전환(레이어 페이드) */
+.app-title {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+  line-height: 1.1;
+}
+
+.title-spacer {
+  visibility: hidden; /* 자리만 차지(레이아웃 기준) */
+}
+
+.title-layer {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: bgFadeIn 0.9s ease forwards;
+}
+
+.tagline {
+  margin: 8px 0 0;
+  font-size: 16px;
+  font-weight: 300;
+  letter-spacing: -0.32px;
+  color: rgba(0, 0, 0, 0.4);
+  transition: color 0.5s ease;
+}
+
+/* 배경 윗부분이 어두울 때 — 태그라인을 흰색 50%로 (가독성) */
+.app-header.on-dark .tagline {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ===== 통화 카드 영역 ===== */
+.converter {
+  position: relative; /* popLayout으로 빠지는 카드의 좌표 기준 (날아가지 않게) */
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 유리 박스 (글래스모피즘) */
+.currency-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 121px;
+  padding: 18px 20px;
+  box-sizing: border-box;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.1); /* 부드러운 그림자 */
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px); /* 뒤 배경 흐림 */
+}
+
+/* ===== 유리 질감 그라데이션 테두리 (좌상단 밝고 우하단 반사) =====
+   gradient를 padding 두께만큼 그린 뒤 mask로 안쪽을 도려내 '링'만 남긴다.
+   유리 모서리에 빛이 닿는 느낌. 카드/스왑/추가 버튼 공용. */
+.currency-card::before,
+.swap-button::before,
+.add-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.2px; /* 테두리 두께 */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.3) 28%,
+    rgba(255, 255, 255, 0.08) 52%,
+    rgba(255, 255, 255, 0.25) 74%,
+    rgba(255, 255, 255, 0.7) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* 카드 빼기(✕) 버튼 — 우측 위 */
+.card-remove {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.card-remove:hover {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* 금액 입력칸 (테두리 없이 카드 안에 녹아듦) */
+.amount-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  text-align: right;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+  color: rgba(0, 0, 0, 0.8);
+  padding: 0;
+}
+
+/* ===== 스왑 버튼 (유리 원형) ===== */
+.swap-divider {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+}
+
+.swap-button {
+  position: relative;
+  width: 53px;
+  height: 53px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.3);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 6px 18px 0 rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+}
+
+.swap-button:hover {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.swap-icon {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* +버튼: 가운데 정렬, 투명한 유리 원 + 흰색 + */
+.add-row {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+.add-button {
+  position: relative;
+  width: 53px;
+  height: 53px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.3);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 6px 18px 0 rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.add-button:hover {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.add-icon {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+/* ===== 푸터 (어두운 배경 위 → 밝은 글자) ===== */
+.app-footer {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.rate-note {
+  font-size: 14px;
+  font-weight: 500; /* Medium (디자인 31:91) */
+  letter-spacing: -0.28px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.rate-note.error {
+  color: #ffe0e0;
+}
+
+/* 오프라인 배지 — 날짜 위 흰 알약 (디자인 53:186) */
+.offline-badge {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 3px 8px;
+  border-radius: 59px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #261824;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.24px;
+}
+
+/* ===== 통화 선택 버튼 (카드 안, 테두리 없이 국기+코드) ===== */
+.currency-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.8);
+  font-size: 18px;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.currency-code {
+  font-weight: 700;
+  letter-spacing: -0.36px;
+}
+
+/* 국기 (SVG). 코드가 없으면 중립 회색 자리표시 */
+.flag {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 15px;
+  border-radius: 2px;
+  background-size: cover;
+  background-position: center;
+  box-shadow: inset 0 0 0 1px #afafaf;
+}
+
+.flag-none {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* ===== 통화·나라 선택 팝업 (앱의 글래스 톤에 맞춤) ===== */
+.picker-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 16, 28, 0.38);
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px); /* 뒤 배경을 흐려 팝업이 떠 보이게 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+}
+
+/* 프로스티드 글래스 패널 (카드와 같은 결) */
+.picker-panel {
+  width: 100%;
+  max-width: 360px;
+  height: min(72vh, 540px);
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(20, 18, 40, 0.32);
+}
+
+.picker-search {
+  flex: 0 0 auto;
+  margin: 14px 14px 8px;
+  padding: 13px 16px;
+  font-family: inherit;
+  font-size: 15px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.65);
+  color: #1a1622;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.picker-search::placeholder {
+  color: #9a93a6;
+}
+
+.picker-search:focus {
+  outline: none;
+  background: #fff;
+  border-color: rgba(138, 61, 255, 0.5);
+  box-shadow: 0 0 0 3px rgba(138, 61, 255, 0.12); /* 브랜드 퍼플 포커스 링 */
+}
+
+.picker-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 10px 10px;
+}
+
+.picker-section {
+  padding: 12px 10px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: #9a93a6;
+}
+
+.picker-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 10px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: #1a1622;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.picker-row:hover {
+  background: rgba(138, 61, 255, 0.07);
+}
+
+.picker-row.active {
+  background: rgba(138, 61, 255, 0.13);
+}
+
+.picker-code {
+  font-weight: 700;
+  flex: 0 0 46px;
+}
+
+.picker-row.active .picker-code {
+  color: #7c3aed; /* 선택된 항목 코드는 브랜드 퍼플 */
+}
+
+.picker-name {
+  color: #8b8494;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.picker-empty {
+  padding: 24px 8px;
+  text-align: center;
+  color: #8b8494;
+  font-size: 14px;
+}
