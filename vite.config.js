@@ -18,8 +18,7 @@ export default defineConfig({
         lang: 'ko',
         theme_color: '#0ea5a4',
         background_color: '#ffffff',
-        display: 'fullscreen', // 상태바·내비바까지 숨긴 완전 전체화면 (안드로이드)
-        display_override: ['fullscreen', 'standalone'],
+        display: 'standalone', // 주소창 없이 앱처럼. 상태바는 theme-color로 배경과 맞춤(검정 띠 방지)
         start_url: '/',
         icons: [
           { src: 'pwa-icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },

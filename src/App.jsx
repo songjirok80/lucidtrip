@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useLayoutEffect, useMemo, forwardRef } fro
 import { motion, AnimatePresence } from 'framer-motion'
 import CurrencyPicker, { CurrencyPickerModal } from './CurrencyPicker'
 import { buildEntries } from './currencies'
-import { getTheme, getInitialTheme, getHeaderDark } from './theme'
+import { getTheme, getInitialTheme, getHeaderDark, getTopColor } from './theme'
 import { t, formatDateStr } from './i18n'
 import './App.css'
 
@@ -312,6 +312,24 @@ function App() {
     let cancelled = false
     getHeaderDark(homeKey).then((dark) => {
       if (!cancelled) setHeaderDark(dark)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [homeKey])
+
+  // 상태바 색(theme-color)을 배경 윗부분과 맞춤 — 설치앱에서 상단 검정 띠 없이 자연스럽게
+  useEffect(() => {
+    let cancelled = false
+    getTopColor(homeKey).then((hex) => {
+      if (cancelled) return
+      let meta = document.querySelector('meta[name="theme-color"]')
+      if (!meta) {
+        meta = document.createElement('meta')
+        meta.setAttribute('name', 'theme-color')
+        document.head.appendChild(meta)
+      }
+      meta.setAttribute('content', hex)
     })
     return () => {
       cancelled = true
