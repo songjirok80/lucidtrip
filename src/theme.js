@@ -408,9 +408,9 @@ function imageStripColor(url, y0f, y1f) {
   })
 }
 
-// 배경 윗부분 대표 색(hex) — 상태바(theme-color)를 여기에 맞춤
+// 배경 맨 윗 가장자리 색(hex) — 상태바(theme-color)를 화면 최상단과 거의 일치시켜 띠가 안 보이게
 export function getTopColor(key) {
-  if (PLACE_BY_ID[key]) return imageStripColor(bgUrl(key), 0, 0.16).then(rgbToHex)
+  if (PLACE_BY_ID[key]) return imageStripColor(bgUrl(key), 0, 0.07).then(rgbToHex)
   return Promise.resolve('#f4f6fb') // 자동 생성 배경의 윗부분은 밝음
 }
 
