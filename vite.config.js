@@ -12,6 +12,7 @@ export default defineConfig({
       includeAssets: ['favicon.svg', 'pwa-icon-192.png', 'pwa-icon-512.png'],
       // 설치 정보 (앱 이름, 색, 아이콘 등)
       manifest: {
+        id: '/',
         name: 'LucidTrip — 여행 환율 계산기',
         short_name: 'LucidTrip',
         description: 'The Lucid Standard for Every Trip. 오프라인에서도 계산돼요.',
