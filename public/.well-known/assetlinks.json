@@ -5,7 +5,8 @@
       "namespace": "android_app",
       "package_name": "app.vercel.lucidtrip.twa",
       "sha256_cert_fingerprints": [
-        "49:3C:CD:E7:EF:92:26:86:63:4E:E7:EE:EE:E3:C2:A4:C1:07:D2:EC:63:AC:40:C8:09:32:37:80:1C:7E:26:71"
+        "49:3C:CD:E7:EF:92:26:86:63:4E:E7:EE:EE:E3:C2:A4:C1:07:D2:EC:63:AC:40:C8:09:32:37:80:1C:7E:26:71",
+        "96:8C:89:1A:42:96:03:BD:70:36:C4:07:DD:53:FE:CD:C1:51:C9:61:A5:83:3B:F4:DC:0F:28:34:0A:B9:FE:97"
       ]
     }
   }
