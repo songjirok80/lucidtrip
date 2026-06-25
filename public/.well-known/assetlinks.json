@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.vercel.lucidtrip.twa",
+      "sha256_cert_fingerprints": [
+        "49:3C:CD:E7:EF:92:26:86:63:4E:E7:EE:EE:E3:C2:A4:C1:07:D2:EC:63:AC:40:C8:09:32:37:80:1C:7E:26:71"
+      ]
+    }
+  }
+]
