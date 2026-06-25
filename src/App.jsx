@@ -348,39 +348,18 @@ function App() {
     }
   }, [homeKey])
 
-  // 설치된 앱에서 "뒤로가기 두 번 누르면 종료" — 한 번 누르면 안내, 2초 내 다시 누르면 종료.
-  // (브라우저 탭에서는 적용 안 함)
+  // 종료 안내 토스트 — main.jsx의 뒤로가기 핸들러(backToExit)가 보내는 신호를 받아 표시
   useEffect(() => {
-    // 설치된 앱이면(브라우저 탭이 아니면) 동작 — 전체화면/standalone/minimal-ui 모두 포함
-    const installed =
-      window.navigator.standalone === true ||
-      (window.matchMedia && !window.matchMedia('(display-mode: browser)').matches)
-    if (!installed) return
-
-    // 뒤로가기를 잡아둘 더미 기록 하나를 쌓아둔다
-    window.history.pushState(null, '', window.location.href)
-    let lastBack = 0
-    let toastTimer
-
-    const onPop = () => {
-      const now = Date.now()
-      if (now - lastBack < 2000) {
-        // 2초 내 두 번째 → 실제로 한 칸 더 뒤로(앱 종료)
-        window.history.back()
-        return
-      }
-      // 첫 번째 → 다시 더미를 쌓아 앱에 머무르고 안내 표시
-      lastBack = now
-      window.history.pushState(null, '', window.location.href)
+    let timer
+    const onHint = () => {
       setToast(t.exitHint)
-      clearTimeout(toastTimer)
-      toastTimer = setTimeout(() => setToast(''), 1800)
+      clearTimeout(timer)
+      timer = setTimeout(() => setToast(''), 1800)
     }
-
-    window.addEventListener('popstate', onPop)
+    window.addEventListener('lucid-exit-hint', onHint)
     return () => {
-      window.removeEventListener('popstate', onPop)
-      clearTimeout(toastTimer)
+      window.removeEventListener('lucid-exit-hint', onHint)
+      clearTimeout(timer)
     }
   }, [])
 
