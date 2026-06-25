@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useLayoutEffect, useMemo, forwardRef } fro
 import { motion, AnimatePresence } from 'framer-motion'
 import CurrencyPicker, { CurrencyPickerModal } from './CurrencyPicker'
 import { buildEntries } from './currencies'
-import { getTheme, getInitialTheme, getHeaderDark, getTopColor } from './theme'
+import { getTheme, getInitialTheme, getHeaderDark, getTopColor, getBottomColor } from './theme'
 import { t, formatDateStr } from './i18n'
 import './App.css'
 
@@ -336,6 +336,18 @@ function App() {
     }
   }, [homeKey])
 
+  // 하단 내비게이션 바 색을 배경 바닥색과 맞춤 — body 배경색이 캔버스로 전파돼 안드로이드 하단바에 반영.
+  // 시각적 배경은 .app-bg(fixed)가 위에서 그대로 덮으므로 영향 없음.
+  useEffect(() => {
+    let cancelled = false
+    getBottomColor(homeKey).then((hex) => {
+      if (!cancelled) document.body.style.backgroundColor = hex
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [homeKey])
+
   // 설치된 앱에서 "뒤로가기 두 번 누르면 종료" — 한 번 누르면 안내, 2초 내 다시 누르면 종료.
   // (브라우저 탭에서는 적용 안 함)
   useEffect(() => {
@@ -371,12 +383,6 @@ function App() {
       clearTimeout(toastTimer)
     }
   }, [])
-
-  // 현재 배경을 html에도 깔아둔다 — 전체화면에서 카메라/상단 영역(콘텐츠 밖)까지 같은 배경으로 채워 검은 띠 방지
-  useEffect(() => {
-    const cur = bgLayers[bgLayers.length - 1]
-    if (cur) document.documentElement.style.background = cur.bg
-  }, [bgLayers])
 
   // 새 배경 레이어의 페이드인이 끝나면 그 아래 오래된 레이어들을 정리
   function handleBgFadeDone(id) {

@@ -18,9 +18,9 @@
   font: 18px/145% var(--sans);
   letter-spacing: 0.18px;
   scrollbar-gutter: stable; /* 카드 수에 따라 스크롤바 생겨도 가로 위치 안 밀리게 */
-  color-scheme: light; /* 앱은 항상 컬러 배경 → 다크모드 미적용(전체화면 상단 검정 방지) */
+  color-scheme: light; /* 앱은 항상 컬러 배경 → 다크모드 미적용 */
   color: var(--text);
-  background: var(--bg);
+  /* html에는 배경을 두지 않는다 → body 배경색이 캔버스로 전파돼 하단 내비바 색에 반영됨 */
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -33,6 +33,7 @@
 
 body {
   margin: 0;
+  background-color: #f4f6fb; /* 캔버스로 전파(하단 내비바 기본색) — JS가 배경 바닥색으로 갱신 */
 }
 
 /* 모바일에서 버튼·링크 누를 때 생기는 파란 하이라이트 박스 제거 */

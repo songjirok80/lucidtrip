@@ -375,9 +375,9 @@ function rgbToHex({ r, g, b }) {
   return '#' + h(r) + h(g) + h(b)
 }
 
-// 이미지 배경의 윗부분 평균 색 ({r,g,b}) — 상태바 색을 배경과 맞추는 데 사용
-function imageTopColor(url) {
-  const ck = 'topcolor:' + url
+// 이미지의 특정 세로 구간(y0~y1, 0~1 비율) 평균 색 ({r,g,b}) — 상태바/내비바 색 맞춤용
+function imageStripColor(url, y0f, y1f) {
+  const ck = `strip:${y0f}-${y1f}:${url}`
   if (ck in colorCache) return Promise.resolve(colorCache[ck])
   return new Promise((resolve) => {
     const img = new Image()
@@ -389,8 +389,9 @@ function imageTopColor(url) {
         canvas.height = H
         const ctx = canvas.getContext('2d')
         ctx.drawImage(img, 0, 0, W, H)
-        const topH = Math.max(1, Math.round(H * 0.16))
-        const data = ctx.getImageData(0, 0, W, topH).data
+        const y0 = Math.max(0, Math.round(H * y0f))
+        const hh = Math.max(1, Math.round(H * y1f) - y0)
+        const data = ctx.getImageData(0, y0, W, hh).data
         let r = 0, g = 0, b = 0, n = 0
         for (let i = 0; i < data.length; i += 4) {
           r += data[i]; g += data[i + 1]; b += data[i + 2]; n++
@@ -407,10 +408,16 @@ function imageTopColor(url) {
   })
 }
 
-// 배경 윗부분의 대표 색(hex) — 상태바(theme-color)를 여기에 맞춰 검정 띠 없이 자연스럽게
+// 배경 윗부분 대표 색(hex) — 상태바(theme-color)를 여기에 맞춤
 export function getTopColor(key) {
-  if (PLACE_BY_ID[key]) return imageTopColor(bgUrl(key)).then(rgbToHex)
+  if (PLACE_BY_ID[key]) return imageStripColor(bgUrl(key), 0, 0.16).then(rgbToHex)
   return Promise.resolve('#f4f6fb') // 자동 생성 배경의 윗부분은 밝음
+}
+
+// 배경 바닥 대표 색(hex) — 하단 내비게이션 바 색을 여기에 맞춤
+export function getBottomColor(key) {
+  if (PLACE_BY_ID[key]) return imageStripColor(bgUrl(key), 0.84, 1).then(rgbToHex)
+  return colorsFor(key).then(({ primary }) => rgbToHex(vivid(primary))) // 자동 배경 바닥은 대표색
 }
 
 // 배경 윗부분(헤더가 놓이는 곳)이 어두운가? → true면 헤더를 흰 글씨로
